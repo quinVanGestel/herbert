@@ -25,3 +25,21 @@ def greet(name:str) -> None:
 
 greet(names[0])
 
+class Car:
+    def __init__(self, colour: str, horsepower: float, name:str, hornSound:str = "beep") -> None:
+        self.colour = colour
+        self.horsepower = horsepower
+        hi = horsepower
+        self.sound = hornSound
+        self.name = name
+        
+    def honk_horn(self) -> None:
+        print(self.sound)
+        
+    def __str__(self) -> str:
+        return f"{self.name} {self.sound} {self.horsepower}hp"
+        
+volvo: Car = Car('purple', 0.5,"volvina")
+greet(volvo.name)
+volvo.honk_horn()
+print(volvo)
