@@ -1,0 +1,4 @@
+list [] is mutable
+tuple () is immutable
+set {} is like list except duplicates aren't allowed
+dict {} has key and value pairs
