@@ -1,45 +1,47 @@
-from typing import Final
-from datetime import datetime
-
-print("Hello world")
-
-NAME: Final[str] = "Herbert"
-number: int = 10
-names: list[str] = [NAME, "I'm not a name..."]
-
-# NAME = "Roger"
-print("Hi I'm "+names[0])
-
-names[1] = "Charlene"
-print("Hello I'm "+names[1])
+import discord
+from discord.ext import commands
+import logging
+from dotenv import load_dotenv
+import os
 
 
-def show_date() -> None:
-    print ("the time rn is")
-    print(datetime.now())
+load_dotenv()
+
+TOKEN: str = str(os.getenv('DISCORD_TOKEN'))
+
+
+humanGreetings = ["hi", "hello","hi herbert"]
+botGreetings = ["hiii", "greetings", "hello there"]
+botPunctuations = [":3", "!"]
+
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8',mode='w')
+intents: discord.Intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+
+bot = commands.Bot(command_prefix=':3', intents=intents)
+
+
+
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user.name} is ready! :3')
+
+@bot.event
+async def on_message(message: discord.Message):
+    print(f'{message.author} whose ID is {message.author.id} sent {message.content}')
     
-show_date()
+    if (bot.user == None):
+        print("Herbert's account is None... Huh?")
+        return
+    if (message.author.id == bot.user.id):
+        print("Herbert sent this message. Herbert refuses to talk to himself.")
+        return
+    await message.channel.send(botGreetings[0])
 
-def greet(name:str) -> None:
-    print(f"Hiii I'm {name} :3")
+@commands.has_guild_permissions(administrator=True)
+async def shutdown():
+    exit()
 
-greet(names[0])
-
-class Car:
-    def __init__(self, colour: str, horsepower: float, name:str, hornSound:str = "beep") -> None:
-        self.colour = colour
-        self.horsepower = horsepower
-        hi = horsepower
-        self.sound = hornSound
-        self.name = name
-        
-    def honk_horn(self) -> None:
-        print(self.sound)
-        
-    def __str__(self) -> str:
-        return f"{self.name} {self.sound} {self.horsepower}hp"
-        
-volvo: Car = Car('purple', 0.5,"volvina")
-greet(volvo.name)
-volvo.honk_horn()
-print(volvo)
+bot.run(token=TOKEN, log_handler=handler,log_level=logging.DEBUG)
