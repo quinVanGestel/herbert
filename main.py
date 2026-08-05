@@ -4,30 +4,40 @@ import logging
 from dotenv import load_dotenv
 import os
 import random
-
+import json
 
 load_dotenv()
 
 TOKEN: str = str(os.getenv('DISCORD_TOKEN'))
-
-equippableRoles = ["purple","red"]
-
-humanGreetings = ["hi", "hello","hi herbert"]
-botGreetings = ["hiii", "greetings", "hello there"]
-botPunctuations = [" :3", "!",".","..."," :D"]
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8',mode='w')
 intents: discord.Intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = commands.Bot(command_prefix='herb ', intents=intents)
+#region Config
+with open('botConfig.json', 'r') as file:
+    botConfig = json.load(file)
+
+print(botConfig)
+
+for item in botConfig:
+    print(item)
+
+commandPrefix:str = botConfig['commandPrefix']
+equippableRoles:list[str] = botConfig['equippableRoles']
+humanGreetings:list[str] = botConfig['humanGreetings']
+botGreetings:list[str] = botConfig['botGreetings']
+botPunctuations:list[str] = botConfig['botPunctuations']
+#endregion
+
+bot = commands.Bot(command_prefix=commandPrefix, intents=intents)
 
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} is ready! :3')
     for guild in bot.guilds:
-        await guild.system_channel.send(random.choice(botGreetings)+random.choice(botPunctuations))
+        await Greet(guild.system_channel)
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -40,7 +50,16 @@ async def on_message(message: discord.Message):
         print("Herbert sent this message. Herbert refuses to talk to himself.")
         return
     
+    await DigestMessage(message)
+    
     await bot.process_commands(message)
+
+async def DigestMessage(message: discord.Message):
+    if humanGreetings.__contains__(message.content.lower()):
+        await Greet(message.channel)
+
+async def Greet(channel: discord.channel):
+    await channel.send(random.choice(botGreetings)+random.choice(botPunctuations))
 
 @bot.command()
 async def meow(ctx: commands.Context):
@@ -50,19 +69,19 @@ async def meow(ctx: commands.Context):
 async def equip(ctx: commands.Context, roleName: str):
     print(f"User requested to equip {roleName}")
     
-    for equippedRole in ctx.author.roles:
-        if roleName == equippedRole.name:
-            await ctx.send(f"You already have {roleName} silly goose.")
-            return
-    
-    if not equippableRoles.__contains__(roleName):
-        await ctx.send("This role is not equippable.")
-        return
-    
     role = discord.utils.get(ctx.guild.roles, name=roleName)
     if role is None:
         print("Role not found")
         await ctx.send("Role not found.")
+        return
+    
+    for equippedRole in ctx.author.roles:
+        if roleName == equippedRole.name:
+            await ctx.send(f"You already have {roleName} silly goose.")
+            return
+        
+    if not equippableRoles.__contains__(roleName):
+        await ctx.send("This role is not equippable.")
         return
     
     await ctx.author.add_roles(role)
@@ -73,32 +92,37 @@ async def equip(ctx: commands.Context, roleName: str):
 async def unequip(ctx: commands.Context, roleName: str):
     print(f"User requested to unequip {roleName}")
     
-    for equippedRole in ctx.author.roles:
-        if roleName == equippedRole.name:
-            await ctx.send(f"You don't have {roleName} silly goose.")
-            return
-        
-    if not equippableRoles.__contains__(roleName):
-        await ctx.send("This role is not unequippable.")
-        return
-    
     role = discord.utils.get(ctx.guild.roles, name=roleName)
     if role is None:
         print("Role not found")
         await ctx.send("Role not found.")
         return
     
+    userHasRole:bool = False
+    for equippedRole in ctx.author.roles:
+        if roleName == equippedRole.name:
+            userHasRole = True
+    if not userHasRole:
+        await ctx.send(f"You don't have {roleName} silly goose.")
+        return
+    
+    if not equippableRoles.__contains__(roleName):
+        await ctx.send("This role is not unequippable.")
+        return
+    
     await ctx.author.remove_roles(role)
     await ctx.send(f"Removed {roleName} from {ctx.author.display_name}")
     print(f"Removed {roleName} from {ctx.author.display_name}")
-
+    return
+        
 @bot.command()
 @commands.has_guild_permissions(administrator=True)
 async def shutdown(ctx:commands.Context):
     await ctx.send("Father... why....")
     await bot.close()
 @shutdown.error
-async def shutdown_error(ctx):
-    await ctx.send("I refuse. You're not my real dad!")
+async def shutdown_error(ctx:commands.Context, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("I refuse. You're not my real dad!")
 
 bot.run(token=TOKEN, log_handler=handler,log_level=logging.DEBUG)

@@ -1,0 +1,25 @@
+{
+    "commandPrefix": "herb ",
+    "equippableRoles": [
+        "purple",
+        "red"
+    ],
+    "humanGreetings": [
+        "hi",
+        "hello",
+        "hi herbert",
+        "sup herbman"
+    ],
+    "botGreetings": [
+        "hiii",
+        "greetings",
+        "hello there"
+    ],
+    "botPunctuations": [
+        " :3",
+        "!",
+        ".",
+        "...",
+        " :D"
+    ]
+}
