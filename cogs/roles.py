@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
+import helper
 
 class Roles(commands.Cog):
-    def __init__(self, bot: commands.Bot, equippableRoles: list[str]):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self._last_member = None # no clue what this does but the tutorial said to add it so ig I'll add it
-        self.equippableRoles = equippableRoles
     
     @commands.command()
     async def equip(self, ctx: commands.Context, roleName: str):
@@ -22,7 +22,7 @@ class Roles(commands.Cog):
                 await ctx.send(f"You already have {roleName} silly goose.")
                 return
         
-        if not self.equippableRoles.__contains__(roleName):
+        if not helper.equippableRoles.__contains__(roleName):
             await ctx.send("This role is not equippable.")
             return
     
@@ -48,7 +48,7 @@ class Roles(commands.Cog):
             await ctx.send(f"You don't have {roleName} silly goose.")
             return
         
-        if not self.equippableRoles.__contains__(roleName):
+        if not helper.equippableRoles.__contains__(roleName):
             await ctx.send("This role is not unequippable.")
             return
         
@@ -56,3 +56,6 @@ class Roles(commands.Cog):
         await ctx.send(f"Removed {roleName} from {ctx.author.display_name}")
         print(f"Removed {roleName} from {ctx.author.display_name}")
         return
+    
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Roles(bot))
