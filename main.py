@@ -4,6 +4,7 @@ import logging
 from dotenv import load_dotenv
 import os
 import asyncio
+import settings
 
 load_dotenv()
 
@@ -14,13 +15,10 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8',mode='w')
 
 intents: discord.Intents = discord.Intents.default()
 intents.message_content = True
-intents.members = True
 
-commandPrefix:str = "herb"
-
-bot = commands.Bot(command_prefix=commandPrefix, intents=intents)
-bot.owner_id = 1135499866387259544
-bot.strip_after_prefix = True
+bot = commands.Bot(command_prefix=settings.commandPrefix, intents=intents)
+bot.owner_id = settings.OWNERID
+bot.strip_after_prefix = settings.stripAfterPrefix
 #endregion
 
 async def Main() -> None:

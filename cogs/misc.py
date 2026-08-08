@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import helper
+import settings
 
 class Misc(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -35,14 +36,14 @@ class Misc(commands.Cog):
         
         
     @commands.command()
-    @commands.has_guild_permissions(administrator=True)
     async def shutdown(self, ctx:commands.Context):
+        if ctx.author.id != settings.OWNERID:
+            await ctx.send("I refuse. You're not my real dad!")
+            return
+    
         await ctx.send("Father... why....")
         await helper.DisableBot(self.bot)
-    @shutdown.error
-    async def shutdown_error(ctx:commands.Context, error):
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("I refuse. You're not my real dad!")
+
             
 async def setup(bot: commands.Bot):
     await bot.add_cog(Misc(bot))

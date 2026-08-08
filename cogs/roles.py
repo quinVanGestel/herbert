@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import helper
+import settings
 
 class Roles(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -22,7 +22,7 @@ class Roles(commands.Cog):
                 await ctx.send(f"You already have {roleName} silly goose.")
                 return
         
-        if not helper.equippableRoles.__contains__(roleName):
+        if not settings.equippableRoles.__contains__(roleName):
             await ctx.send("This role is not equippable.")
             return
     
@@ -48,7 +48,7 @@ class Roles(commands.Cog):
             await ctx.send(f"You don't have {roleName} silly goose.")
             return
         
-        if not helper.equippableRoles.__contains__(roleName):
+        if not settings.equippableRoles.__contains__(roleName):
             await ctx.send("This role is not unequippable.")
             return
         
