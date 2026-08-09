@@ -27,8 +27,6 @@ class Misc(commands.Cog):
         
         await helper.DigestMessage(message)
         
-        await self.bot.process_commands(message)
-
 
     @commands.command()
     async def meow(self, ctx: commands.Context):

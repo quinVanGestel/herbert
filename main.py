@@ -11,7 +11,7 @@ load_dotenv()
 #region Bot initialisation
 TOKEN: str = str(os.getenv('DISCORD_TOKEN'))
 
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8',mode='w')
+# handler = logging.FileHandler(filename='discord.log', encoding='utf-8',mode='w')
 
 intents: discord.Intents = discord.Intents.default()
 intents.message_content = True
@@ -34,6 +34,7 @@ async def LoadCogs() -> None:
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             await bot.load_extension(f"cogs.{filename[:-3]}")
+            print(f"Loaded {filename}")
     print("Cogs loaded")
     
 asyncio.run(Main())

@@ -1,4 +1,3 @@
 1. figure out database funny business (probably mongodb) to make guild wide settings
-2. add a feature where an admin can send "herb equip @haroldGreggington blue", and the user haroldGreggington will turn blue. Maybe with ids idk.
-3. Make jeans owner.
-4. fix the bug of ctx.send executing twice
+2. teach herbert how to read roles with spaces in them (hot pink)
+3. make only people with manage roles perms able to change other people's roles

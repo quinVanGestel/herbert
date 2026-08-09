@@ -2,7 +2,8 @@
     "commandPrefix": "herb",
     "equippableRoles": [
         "purple",
-        "red"
+        "red",
+        "blue"
     ],
     "humanGreetings": [
         "hi",
