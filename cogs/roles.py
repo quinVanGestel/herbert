@@ -12,19 +12,14 @@ class Roles(commands.Cog):
         if recipient is None:
             recipient = ctx.author
         
-        print(f"{recipient.display_name} requested to equip {roleName}")
+        print(f"{ctx.author.display_name} requested to equip {roleName} for {recipient.display_name}")
         
         role = discord.utils.get(ctx.guild.roles, name=roleName)
-        if role is None:
-            await ctx.send("Role not found.")
-            return
-
-        if UserHasRole(recipient.roles, roleName):
-            await ctx.send(f"{recipient.display_name} already has {roleName} silly goose.")
+        
+        if not await AssignRoleIsPossible(ctx, role, recipient):
             return
         
-        if not settings.equippableRoles.__contains__(roleName):
-            await ctx.send("This role is not equippable.")
+        if not await AssignRoleIsAllowed(ctx, role, recipient):
             return
         
         await recipient.add_roles(role)
@@ -36,27 +31,53 @@ class Roles(commands.Cog):
         if recipient is None:
             recipient = ctx.author
         
-        print(f"{recipient.display_name} requested to unequip {roleName}")
+        print(f"{ctx.author.display_name} requested to unequip {roleName} for {recipient.display_name}")
 
         role = discord.utils.get(ctx.guild.roles, name=roleName)
-        if role is None:
-            await ctx.send("Role not found.")
-            return
 
-        if not UserHasRole(recipient.roles, roleName):
-            await ctx.send(f"{recipient.display_name} doesn't have {roleName} silly goose.")
+        if not await AssignRoleIsPossible(ctx, role, recipient):
             return
         
-        if not settings.equippableRoles.__contains__(roleName):
-            await ctx.send("This role is not unequippable.")
+        if not await AssignRoleIsAllowed(ctx, role, recipient):
             return
         
         await recipient.remove_roles(role)
         await ctx.send(f"Removed {roleName} from {recipient.display_name}")
         print(f"Removed {roleName} from {recipient.display_name}")
-        
+
+async def AssignRoleIsPossible(ctx: commands.Context, role: discord.Role, recipient: discord.Member, discordMessageOnFailure: bool = True, debugLogOnFailure: bool = True) -> bool :
+    if role is None:
+        if (discordMessageOnFailure):
+            await ctx.send("Role not found.")
+        if (debugLogOnFailure):
+            await print("Role not found.")
+        return False
+
+    if not UserHasRole(recipient.roles, role.name):
+        if (discordMessageOnFailure):
+            await ctx.send(f"{recipient.display_name} doesn't have {role.name} silly goose.")
+        if (debugLogOnFailure):
+            await print(f"{recipient.display_name} doesn't have {role.name} silly goose.")
+        return False
+    return True
+
+async def AssignRoleIsAllowed(ctx: commands.Context, role: discord.Role, recipient: discord.Member, discordMessageOnFailure: bool = True, debugLogOnFailure: bool = True) -> bool:
+    if not settings.equippableRoles.__contains__(role.name):
+        if (discordMessageOnFailure):
+            await ctx.send("This role can't be assigned.")
+        if (debugLogOnFailure):
+            await print("This role can't be assigned.")
+        return False
     
-def UserHasRole(equippedRoles: list[discord.Role], roleName: str) -> bool:
+    if recipient.id is not ctx.author.id and not ctx.author.guild_permissions.manage_roles:
+        if (discordMessageOnFailure):
+            await ctx.send("You do not have manage roles permissions.")
+        if (debugLogOnFailure):
+            await print("You do not have manage roles permissions.")
+        return False
+    return True
+
+async def UserHasRole(equippedRoles: list[discord.Role], roleName: str) -> bool:
     for equippedRole in equippedRoles:
         if roleName == equippedRole.name:
             print(roleName)
