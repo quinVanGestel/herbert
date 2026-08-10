@@ -7,7 +7,7 @@ class Misc(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self._last_member = None # no clue what this does but the tutorial said to add it so ig I'll add it
-    
+        
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self.bot.user.name} is ready! :3')
@@ -27,7 +27,7 @@ class Misc(commands.Cog):
         
         await helper.DigestMessage(message)
         
-
+        
     @commands.command()
     async def meow(self, ctx: commands.Context):
         await ctx.send("mrrrp :3")

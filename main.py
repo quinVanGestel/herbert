@@ -16,10 +16,19 @@ TOKEN: str = str(os.getenv('DISCORD_TOKEN'))
 intents: discord.Intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix=settings.commandPrefix, intents=intents)
-bot.owner_id = settings.OWNERID
-bot.strip_after_prefix = settings.stripAfterPrefix
+bot = commands.Bot(
+    command_prefix=settings.commandPrefix, 
+    intents=intents, 
+    owner_id=settings.OWNERID, 
+    strip_after_prefix=settings.stripAfterPrefix
+    )
 #endregion
+
+@bot.event
+async def on_message(message: discord.Message):
+    message.content = message.content.lower()
+    await bot.process_commands(message)
+
 
 async def Main() -> None:
     async with bot:
