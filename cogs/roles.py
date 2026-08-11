@@ -5,7 +5,6 @@ import settings
 class Roles(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self._last_member = None # no clue what this does but the tutorial said to add it so ig I'll add it
 
     @commands.command()
     async def equip(self, ctx: commands.Context, roleName: str,recipient: discord.Member = None):

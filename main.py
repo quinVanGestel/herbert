@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import asyncio
 import settings
+import helper
 
 load_dotenv()
 
@@ -25,10 +26,23 @@ bot = commands.Bot(
 #endregion
 
 @bot.event
+async def on_ready():
+    print(f'{bot.user.name} is ready! :3')
+    for guild in bot.guilds:
+        await helper.Greet(guild.system_channel)
+
+@bot.event
 async def on_message(message: discord.Message):
+    if (message.author.id == bot.user.id):
+        print("Herbert sent this message. Herbert refuses to listen to himself.")
+        return
+    
+    print(f'{message.author} whose ID is {message.author.id} sent {message.content}')
+    
+    await helper.DigestMessage(message)
+    
     message.content = message.content.lower()
     await bot.process_commands(message)
-
 
 async def Main() -> None:
     async with bot:
