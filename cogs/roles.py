@@ -7,9 +7,9 @@ class Roles(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def equip(self, ctx: commands.Context, roleName: str,recipient: discord.Member = None):
-        if recipient is None:
-            recipient = ctx.author
+    async def equip(self, ctx: commands.Context,*, roleName: str):
+        # if recipient is None:
+        recipient = ctx.author
         
         print(f"{ctx.author.display_name} requested to equip {roleName} for {recipient.display_name}")
         
@@ -26,9 +26,9 @@ class Roles(commands.Cog):
         print(f"Gave {roleName} to {recipient.display_name}")
     
     @commands.command()
-    async def unequip(self, ctx: commands.Context, roleName: str, recipient: discord.Member = None):
-        if recipient is None:
-            recipient = ctx.author
+    async def unequip(self, ctx: commands.Context,*, roleName: str):
+        # if recipient is None:
+        recipient = ctx.author
         
         print(f"{ctx.author.display_name} requested to unequip {roleName} for {recipient.display_name}")
 

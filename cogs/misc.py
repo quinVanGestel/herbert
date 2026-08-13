@@ -20,7 +20,7 @@ class Misc(commands.Cog):
     
         await ctx.send("Father... why....")
         await helper.DisableBot(self.bot)
-
-            
+    
+    
 async def setup(bot: commands.Bot):
     await bot.add_cog(Misc(bot))
