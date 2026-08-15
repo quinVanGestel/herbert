@@ -25,7 +25,7 @@ class Roles(commands.Cog):
         for recipient in recipients:
             print(f"{ctx.author.display_name} requested to equip {roleName} for {recipient.display_name}")
             
-            if not await AssignRoleIsPossible(ctx, role, recipient, True):
+            if not await AssignRoleIsPossible(ctx, roleName, recipient, True):
                 return
             
             if not await AssignRoleIsAllowed(ctx, role, recipient, True):
@@ -58,48 +58,68 @@ async def ExtractMembersFromString(ctx: commands.Context, string: str) -> tuple:
     print(f"ExtractMemberFromString called with argument {string}")
     splitString: list[str] = string.split()
     members: list[discord.Member] = []
-    
+
     print("Running through mentions")
-    for mention in ctx.message.mentions:
+    for mention in ctx.message.mentions.copy():
         print(f"Checking {mention.display_name}")
         if isinstance(mention, discord.Member):
             members.append(mention)
             print(f"Added {mention.display_name}")
             print(f"pre: {splitString}")
-            splitString: list[str] = helper.remove_values_from_list(splitString, f"<@{mention.id}>")
+            for i, string in enumerate(splitString):
+                print(f"removing <@{mention.id}> from {string}")
+                splitString[i] = string.replace(f"<@{mention.id}>", "")
+            # splitString: list[str] = helper.remove_values_from_list(splitString, "")
+            # splitString: list[str] = helper.remove_values_from_list(splitString, f"<@{mention.id}>")
             print(f"post: {splitString}")
     
     print("Running through any int strings that may be in splitString")
-    for word in splitString:
+    for word in splitString.copy():
         try:
             wordIntified: int = int(word)
         except:
-            print("Split string item cannot be cast to int")
+            print(f"{word} cannot be cast to int")
         else:
             print(f"Intified {word}")
             try:
                 member: discord.Member = await ctx.guild.fetch_member(int(wordIntified))
             except:
-                print("Fetching member with splitStringItemIntified made crash :(")
+                print(f"Fetching member with {wordIntified} made crash :(")
             else:
                 if member is not None:
                     members.append(member)
                     splitString.remove(word)
                     print(f"Successfully added {member.display_name} and removed {word} from splitString.")
-                    
+    
+    for i, string in enumerate(splitString):
+        splitString[i] = string.strip()
+    
+    splitString = list(filter(None, splitString))
+    
     filteredString:str = ""
     filteredString = " ".join(splitString)
     print(f"Final result: {filteredString}")
+    print(len(members))
+    print(range(len(members)))
+    for x in range(len(members)):
+        for y in range(len(members)-x-1):
+            print(f"checking ({x},{x+y+1})")
+            if members[x].id == members[x+y+1].id:
+                print(f"Removed {members[x+y+1].display_name} at index {x+y+1} from the members list.")
+                members.pop(x+y+1)
+    
+    
     return (filteredString, members)
     
 
-async def AssignRoleIsPossible(ctx: commands.Context, role: discord.Role, recipient: discord.Member, equip: bool,discordMessageOnFailure: bool = True, debugLogOnFailure: bool = True) -> bool :
+async def AssignRoleIsPossible(ctx: commands.Context, roleName: discord.Role, recipient: discord.Member, equip: bool,discordMessageOnFailure: bool = True, debugLogOnFailure: bool = True) -> bool :
     print("Checking if assignroleispossible")
+    role = discord.utils.get(ctx.guild.roles, name=roleName)
     if role is None:
         if (discordMessageOnFailure):
-            await ctx.send("Role not found.")
+            await ctx.send(f"Could not find the role `{roleName}`")
         if (debugLogOnFailure):
-            await print("Role not found.")
+            await print(f"Could not find the role `{roleName}`")
         return False
 
     if not role.is_assignable():
