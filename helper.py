@@ -13,3 +13,7 @@ async def Greet(channel: discord.channel) -> None:
     
 async def DisableBot(bot: commands.Bot) -> None:
     await bot.close()
+    
+    # deffo wrote this myself and didn't steal it
+def remove_values_from_list(the_list, val):
+   return [value for value in the_list if value != val]
