@@ -25,15 +25,11 @@ class Roles(commands.Cog):
         for recipient in recipients:
             print(f"{ctx.author.display_name} requested to equip {roleName} for {recipient.display_name}")
             
-            if not await AssignRoleIsPossible(ctx, roleName, recipient, True):
-                return
-            
-            if not await AssignRoleIsAllowed(ctx, role, recipient, True):
-                return
-            
-            await recipient.add_roles(role)
-            await ctx.send(f"Gave {roleName} to {recipient.display_name}")
-            print(f"Gave {roleName} to {recipient.display_name}")
+            if await AssignRoleIsPossible(ctx, roleName, recipient, True) and await AssignRoleIsAllowed(ctx, role, recipient, True):
+                await recipient.add_roles(role)
+                await ctx.send(f"Gave {roleName} to {recipient.display_name}")
+                print(f"Gave {roleName} to {recipient.display_name}")
+
 
     @commands.command()
     async def unequip(self, ctx: commands.Context,*, roleName: str):
@@ -54,16 +50,16 @@ class Roles(commands.Cog):
         await ctx.send(f"Removed {roleName} from {recipient.display_name}")
         print(f"Removed {roleName} from {recipient.display_name}")
 
-async def ExtractMembersFromString(ctx: commands.Context, string: str) -> tuple:
+async def ExtractMembersFromString(ctx: commands.Context, string: str) -> tuple[str, list[discord.Member]]:
     print(f"ExtractMemberFromString called with argument {string}")
     splitString: list[str] = string.split()
-    members: list[discord.Member] = []
+    recipients: list[discord.Member] = []
 
     print("Running through mentions")
     for mention in ctx.message.mentions.copy():
         print(f"Checking {mention.display_name}")
         if isinstance(mention, discord.Member):
-            members.append(mention)
+            recipients.append(mention)
             print(f"Added {mention.display_name}")
             print(f"pre: {splitString}")
             for i, string in enumerate(splitString):
@@ -82,14 +78,14 @@ async def ExtractMembersFromString(ctx: commands.Context, string: str) -> tuple:
         else:
             print(f"Intified {word}")
             try:
-                member: discord.Member = await ctx.guild.fetch_member(int(wordIntified))
+                recipient: discord.Member = await ctx.guild.fetch_member(int(wordIntified))
             except:
                 print(f"Fetching member with {wordIntified} made crash :(")
             else:
-                if member is not None:
-                    members.append(member)
+                if recipient is not None:
+                    recipients.append(recipient)
                     splitString.remove(word)
-                    print(f"Successfully added {member.display_name} and removed {word} from splitString.")
+                    print(f"Successfully added {recipient.display_name} and removed {word} from splitString.")
     
     for i, string in enumerate(splitString):
         splitString[i] = string.strip()
@@ -99,19 +95,18 @@ async def ExtractMembersFromString(ctx: commands.Context, string: str) -> tuple:
     filteredString:str = ""
     filteredString = " ".join(splitString)
     print(f"Final result: {filteredString}")
-    print(len(members))
-    print(range(len(members)))
-    for x in range(len(members)):
-        for y in range(len(members)-x-1):
+    print(len(recipients))
+    print(range(len(recipients)))
+    for x in range(len(recipients)):
+        for y in range(len(recipients)-x-1):
             print(f"checking ({x},{x+y+1})")
-            if members[x].id == members[x+y+1].id:
-                print(f"Removed {members[x+y+1].display_name} at index {x+y+1} from the members list.")
-                members.pop(x+y+1)
+            if recipients[x].id == recipients[x+y+1].id:
+                print(f"Removed {recipients[x+y+1].display_name} at index {x+y+1} from the members list.")
+                recipients.pop(x+y+1)
     
     
-    return (filteredString, members)
+    return (filteredString, recipients)
     
-
 async def AssignRoleIsPossible(ctx: commands.Context, roleName: discord.Role, recipient: discord.Member, equip: bool,discordMessageOnFailure: bool = True, debugLogOnFailure: bool = True) -> bool :
     print("Checking if assignroleispossible")
     role = discord.utils.get(ctx.guild.roles, name=roleName)
