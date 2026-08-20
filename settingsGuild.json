@@ -24,5 +24,12 @@
         "...",
         " :D"
     ],
+    "meowResponses": [
+        "wruff",
+        "meow",
+        "mrrrp :3",
+        "nya :3c",
+        ""
+    ],
     "stripAfterPrefix": true
 }

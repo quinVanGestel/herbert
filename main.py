@@ -32,10 +32,12 @@ async def on_ready():
         await helper.Greet(guild.system_channel)
 
 @bot.event
-async def on_message(message: discord.Message):
+async def on_message(ctx: commands.Context, message: discord.Message):
     if (message.author.id == bot.user.id):
         print("Herbert sent this message. Herbert refuses to listen to himself.")
         return
+    
+    # if (ctx)
     
     print(f'{message.author} whose ID is {message.author.id} sent {message.content}')
     

@@ -1,3 +1,9 @@
 {
-    "ownerID": 1135499866387259544
+    "ownerID": 1135499866387259544,
+    "easterEggs": {
+        "meow": {
+            "chance": 5,
+            "value": "Father I have told you so many times, I am not a cat. I do not appreciate you pressuring me into meowing, it is disgraceful."
+        }
+    }
 }
